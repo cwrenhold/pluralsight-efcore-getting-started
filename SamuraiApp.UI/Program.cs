@@ -1,26 +1,30 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using Microsoft.EntityFrameworkCore;
 using SamuraiApp.Data;
 using SamuraiApp.Domain;
-
-Console.WriteLine("Hello, World!");
 
 var _context = new SamuraiContext();
 _context.Database.EnsureCreated();
 
 getSamurais("Before Add");
-addSamurai();
-getSamurais("After Add");
+addSamurai("Julie", "Sampson");
+// getSamurais("After Add");
 
-void addSamurai()
+void addSamurai(params string[] names)
 {
-    var samurai = new Samurai { Name = "Sampson" };
-    _context.Samurais.Add(samurai);
+    foreach (var name in names)
+    {
+        _context.Samurais.Add(new Samurai { Name = name });
+    }
+
     _context.SaveChanges();
 }
 
 void getSamurais(string text)
 {
-    var samurais = _context.Samurais.ToList();
+    var samurais = _context.Samurais
+        .TagWith("ConsoleApp.Program.GetSamurais method")
+        .ToList();
+
     System.Console.WriteLine($"{text}: Samurai count is {samurais.Count}");
     foreach (var samurai in samurais)
     {
