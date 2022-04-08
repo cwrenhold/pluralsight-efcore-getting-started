@@ -1,0 +1,19 @@
+version: "3.9"  # optional since v1.27.0
+
+services:
+
+  # Database server
+  mssql-data:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    # Uncomment this in a real scenario so this container restarts itself if there is an issue
+    # restart: always
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SQL_PASSWORD}
+    ports:
+      - "9001:1433"
+    volumes:
+      - logvolume01:/var/log
+
+volumes:
+  logvolume01: {}
