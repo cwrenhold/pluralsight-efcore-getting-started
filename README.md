@@ -7,6 +7,7 @@ Rather than attaching a database to the project directly, which would be relativ
 ## Requirements
 
 * .NET 6.0 SDK
+* The Entity Framework tool should be installed globall for .NET with `dotnet tool install --global dotnet-ef`
 * Docker (configured to be able to run Linux containers)
 
 ## Getting Started
@@ -33,6 +34,17 @@ For managing the database, there are a few commands which are useful to have to 
     ```
     docker compose down
     ```
+
+## Using `dotnet` commands instead of the Package Manager Console
+
+As we're not using Visual Studio, it makes sense to use the `dotnet` CLI instead of the Package Manager Console to handle Entity Framework commands. Here are a few examples of how that changes:
+
+| Package Manager Console | dotnet                            | Description                                                           |
+| ----------------------- | --------------------------------- | --------------------------------------------------------------------- |
+| `add-migration <name>`  | `dotnet ef migrations add <name>` | Creates a new migration in Entity Framework                           |
+| `update-database`       | `dtonet ef database update`       | Runs all migrations which have not been executed against the database |
+
+You can view more of these commands with the `dotnet ef` command.
 
 ## Notes
 
