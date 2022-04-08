@@ -42,7 +42,8 @@ As we're not using Visual Studio, it makes sense to use the `dotnet` CLI instead
 | Package Manager Console | dotnet                            | Description                                                           |
 | ----------------------- | --------------------------------- | --------------------------------------------------------------------- |
 | `add-migration <name>`  | `dotnet ef migrations add <name>` | Creates a new migration in Entity Framework                           |
-| `update-database`       | `dtonet ef database update`       | Runs all migrations which have not been executed against the database |
+| `update-database`       | `dotnet ef database update`       | Runs all migrations which have not been executed against the database |
+| `get-migration`         | `dotnet ef migrations list`       | List all migrations and their status                                  |
 
 You can view more of these commands with the `dotnet ef` command.
 
