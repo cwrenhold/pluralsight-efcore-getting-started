@@ -49,5 +49,6 @@ You can view more of these commands with the `dotnet ef` command.
 
 ## Notes
 
-* There is a `.env` file in the root directory which contains the environment variables for the MS SQL Server, this may not normally be under source control as it contains secrets (or it may be one of many environment variables files, of which one or more may not be under source control for similar reasons)
+* There is a `.env` file in the root directory which contains the environment variables for the MS SQL Server, this may not normally be under source control as it contains secrets (or it may be one of many environment variables files, of which one or more may not be under source control for similar reasons).
 * Currently, the connection string is hardcoded in the `SamuraiApp.Data` project, in the `SamuraiContext.cs` file, as per the course. This contains the password from the `.env` file again, so **if you want to change the password for your MS SQL Server, you will need to change this in both places**. This is also the case for the port, if you want to change that. Ideally, this would be generated based on the environment variables, but as this is a training course this is not necessary at this point.
+* These projects are set up to have the `nullable` enabled, and that means that by default any classes are not nullable unless otherwise specified. this was not fully supported in EF Core 5, but it is in EF Core 6, so when it comes to added dependent tables in a one-to-one setup, be sure to add the property as a nullable instead the default.
