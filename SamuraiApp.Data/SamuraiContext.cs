@@ -13,7 +13,7 @@ public class SamuraiContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlServer(
-            @"Data Source=localhost,9001;Initial Catalog=SamuraiAppDb;Persist Security Info=True;User ID=sa;Password=Password01!;TrustServerCertificate=True")
+            @"Data Source=localhost,9001;Initial Catalog=SamuraiAppDb;Persist Security Info=True;User ID=sa;Password=Password01!;TrustServerCertificate=True", opt => opt.MaxBatchSize(100))
             .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
             .EnableSensitiveDataLogging();
     }

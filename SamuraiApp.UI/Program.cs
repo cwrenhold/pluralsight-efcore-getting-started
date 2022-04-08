@@ -6,10 +6,10 @@ var _context = new SamuraiContext();
 _context.Database.EnsureCreated();
 
 getSamurais("Before Add");
-addSamurai("Julie", "Sampson");
+addSamuraiByName("Shimada", "Okamoto", "Kikuchio", "Hayashida");
 // getSamurais("After Add");
 
-void addSamurai(params string[] names)
+void addSamuraiByName(params string[] names)
 {
     foreach (var name in names)
     {
