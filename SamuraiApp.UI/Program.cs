@@ -4,6 +4,7 @@ using SamuraiApp.Domain;
 
 var _context = new SamuraiContext();
 _context.Database.EnsureCreated();
+var _contextNT = new SamuraiContextNoTracking();
 
 getSamurais("Before Add");
 addSamuraiByName("Shimada", "Okamoto", "Kikuchio", "Hayashida");
@@ -13,12 +14,16 @@ retrieveAndUpdateMultipleSamurai();
 multipleDatabaseOperations();
 retrieveAndDeleteSamurai();
 // getSamurais("After Add");
+queryAndUpdateBattles_Disconnected();
+
+// Run a single query without tracking on the entities returned
+var untrackedSamurai = _context.Samurais.AsNoTracking().FirstOrDefault();
 
 void addSamuraiByName(params string[] names)
 {
     foreach (var name in names)
     {
-        _context.Samurais.Add(new Samurai { Name = name });
+        _contextNT.Samurais.Add(new Samurai { Name = name });
     }
 
     _context.SaveChanges();
@@ -26,7 +31,7 @@ void addSamuraiByName(params string[] names)
 
 void getSamurais(string text)
 {
-    var samurais = _context.Samurais
+    var samurais = _contextNT.Samurais
         .TagWith("ConsoleApp.Program.GetSamurais method")
         .ToList();
 
@@ -39,7 +44,7 @@ void getSamurais(string text)
 
 void queryAggregates()
 {
-    var samurai = _context.Samurais.Find(2);
+    var samurai = _contextNT.Samurais.Find(2);
 }
 
 void retrieveAndUpdateSamurai()
@@ -81,5 +86,26 @@ void retrieveAndDeleteSamurai()
     {
         _context.Remove(samurai);
         _context.SaveChanges();
+    }
+}
+
+void queryAndUpdateBattles_Disconnected()
+{
+    List<Battle> disconnectedBattles;
+    using (var context = new SamuraiContext())
+    {
+        disconnectedBattles = context.Battles.ToList();
+    }
+
+    disconnectedBattles.ForEach(b =>
+    {
+        b.StartDate = new DateTime(1570, 1, 1);
+        b.EndDate = new DateTime(1570, 12, 1);
+    });
+
+    using (var context2 = new SamuraiContext())
+    {
+        context2.UpdateRange(disconnectedBattles);
+        context2.SaveChanges();
     }
 }
