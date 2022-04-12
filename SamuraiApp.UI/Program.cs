@@ -15,6 +15,8 @@ multipleDatabaseOperations();
 retrieveAndDeleteSamurai();
 // getSamurais("After Add");
 queryAndUpdateBattles_Disconnected();
+insertNewSamuraiWithAQuote();
+addQuoteToExistingSamuraiWhileTracked();
 
 // Run a single query without tracking on the entities returned
 var untrackedSamurai = _context.Samurais.AsNoTracking().FirstOrDefault();
@@ -108,4 +110,108 @@ void queryAndUpdateBattles_Disconnected()
         context2.UpdateRange(disconnectedBattles);
         context2.SaveChanges();
     }
+}
+
+void insertNewSamuraiWithAQuote()
+{
+    var samurai = new Samurai
+    {
+        Name = "Kambei Shimada",
+        Quotes = new List<Quote>
+        {
+            new Quote { Text = "I've come to save you"}
+        }
+    };
+
+    _context.Samurais.Add(samurai);
+    _context.SaveChanges();
+}
+
+void addQuoteToExistingSamuraiWhileTracked()
+{
+    var samurai = _context.Samurais.First();
+
+    samurai.Quotes.Add(new Quote
+    {
+        Text = "I bet you're happy that I've saved you!"
+    });
+
+    _context.SaveChanges();
+}
+
+void addQuoteToExistingSamuraiNotTracked(int samuraiId)
+{
+    var samurai = _contextNT.Samurais.Find(samuraiId);
+
+    samurai.Quotes.Add(new Quote
+    {
+        Text = "Not that I saved you, will you feed me dinner?"
+    });
+
+    using (var context = new SamuraiContext())
+    {
+        // Add tracking to the entity
+        context.Samurais.Update(samurai);
+
+        // At this point, the quote should have the samurai ID added to it, even though the DB hasn't been hit, because EF Core knows the this should be the same as the parent samurai's ID
+
+        // This will save the quote, but it will ALSO update the Samurai, even if nothing has changed, because EF doesn't know what has changed
+        context.SaveChanges();
+    }
+}
+
+void addQuoteToExistingSamuraiNotTrackedWithAttach(int samuraiId)
+{
+    var samurai = _contextNT.Samurais.Find(samuraiId);
+
+    samurai.Quotes.Add(new Quote
+    {
+        Text = "Not that I saved you, will you feed me dinner?"
+    });
+
+    using (var context = new SamuraiContext())
+    {
+        // Add tracking to the entity, but assume the current entity is unmodified
+        context.Samurais.Attach(samurai);
+
+        // At this point, the quote should have the samurai ID added to it, even though the DB hasn't been hit, because EF Core knows the this should be the same as the parent samurai's ID
+
+        // This will save the quote, but not the samurai as there were no changes on the Samurai
+        context.SaveChanges();
+    }
+}
+
+void addQuoteToExistingSamuraiNotTracked_Simpler(int samuraiId)
+{
+    var quote = new Quote 
+    {
+        Text = "Thanks for dinner!",
+        SamuraiId = samuraiId
+    };
+
+    using var context = new SamuraiContext();
+    context.Quotes.Add(quote);
+    context.SaveChanges();
+}
+
+void eagerlyLoadSamuraiWithQuotes()
+{
+    // Retrieve all samurai and quotes in one query
+    var samuraiWithQuotes = _context.Samurais.Include(s => s.Quotes).ToList();
+
+    // Can also use .ThenInclude to include children of children objects or Include(s => s.Child.Grandchild)
+}
+
+void eagerlyLoadSamuraiWithQuotesWithSplitQuery()
+{
+    // Retrieves all the samurai, then retrieves all the quotes for those samurai
+    var samuraiWithQuotes = _context.Samurais.Include(s => s.Quotes).AsSplitQuery().ToList();
+}
+
+void eargerlyLoadSamuraiWithFilteredQuotes()
+{
+    // Only include quotes which contain "Thanks"
+    var samuraiWithQuotes = _context.Samurais
+        .Include(s => s.Quotes.Where(q => q.Text.Contains("Thanks")))
+        .ToList();
 }
