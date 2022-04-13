@@ -17,6 +17,7 @@ retrieveAndDeleteSamurai();
 queryAndUpdateBattles_Disconnected();
 insertNewSamuraiWithAQuote();
 addQuoteToExistingSamuraiWhileTracked();
+explicitLoadQuotes();
 
 // Run a single query without tracking on the entities returned
 var untrackedSamurai = _context.Samurais.AsNoTracking().FirstOrDefault();
@@ -214,4 +215,40 @@ void eargerlyLoadSamuraiWithFilteredQuotes()
     var samuraiWithQuotes = _context.Samurais
         .Include(s => s.Quotes.Where(q => q.Text.Contains("Thanks")))
         .ToList();
+}
+
+void projectSomeProperties()
+{
+    var someProps = _context.Samurais.Select(s => new { s.Id, s.Name }).ToList();
+}
+
+// NOTE: Anonymous types are NOT tracked, but child objects on an anonymous type CAN BE tracked if they are normal entity types
+void projectSomePropertiesWithQuotes()
+{
+    var someProps = _context.Samurais
+        .Select(s => new { s.Id, s.Name, s.Quotes })
+        .ToList();
+}
+
+void projectSomePropertiesWithAggregatedQuotes()
+{
+    var someProps = _context.Samurais
+        .Select(s => new { s.Id, s.Name, QuoteCount = s.Quotes.Count })
+        .ToList();
+}
+
+void explicitLoadQuotes()
+{
+    // Ensure there's a horse for the first samurai
+    _context.Set<Horse>().Add(new Horse { SamuraiId = 1, Name = "Mr. Ed" });
+    _context.SaveChanges();
+    
+    // Reset th change tracker
+    _context.ChangeTracker.Clear();
+
+    var samurai = _context.Samurais.Find(1);
+
+    // Load in the collection of quotes and the reference to the horse
+    _context.Entry(samurai).Collection(s => s.Quotes).Load();
+    _context.Entry(samurai).Reference(s => s.Horse).Load();
 }
