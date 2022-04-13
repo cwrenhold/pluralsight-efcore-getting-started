@@ -2,7 +2,7 @@
 
 This is based on the Pluralsight course, [Entity Framework Core: Getting Started](https://app.pluralsight.com/library/courses/entity-framework-core-get-started), but modified slightly to work more nicely with .NET 6 and in IDE/editors other than Visual Studio, in particular VS Code.
 
-Rather than attaching a database to the project directly, which would be relatively normal in Visual Studio, this connects to a local MS SQL server which is handled by Docker via Docker Compose.
+Rather than attaching a database to the project directly, which would be relatively normal in Visual Studio, this connects to a local MS SQL/Postgres server which is handled by Docker via Docker Compose (see notes).
 
 ## Requirements
 
@@ -52,3 +52,5 @@ You can view more of these commands with the `dotnet ef` command.
 * There is a `.env` file in the root directory which contains the environment variables for the MS SQL Server, this may not normally be under source control as it contains secrets (or it may be one of many environment variables files, of which one or more may not be under source control for similar reasons).
 * Currently, the connection string is hardcoded in the `SamuraiApp.Data` project, in the `SamuraiContext.cs` file, as per the course. This contains the password from the `.env` file again, so **if you want to change the password for your MS SQL Server, you will need to change this in both places**. This is also the case for the port, if you want to change that. Ideally, this would be generated based on the environment variables, but as this is a training course this is not necessary at this point.
 * These projects are set up to have the `nullable` enabled, and that means that by default any classes are not nullable unless otherwise specified. this was not fully supported in EF Core 5, but it is in EF Core 6, so when it comes to added dependent tables in a one-to-one setup, be sure to add the property as a nullable instead the default.
+* I've moved this over to use Postgres as of 2022-04-13, the original MS SQL Server container is still in the `docker-compose.yml`, however this is now commented out and the migrations were recreated to work with this
+    * If you want to switch database server, it is best to remove all of the existing migrations and snapshot and then run `dotnet ef migrations add init` to create a new `init` migration for the new database server
