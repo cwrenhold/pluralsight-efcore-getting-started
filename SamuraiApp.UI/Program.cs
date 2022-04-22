@@ -252,3 +252,71 @@ void explicitLoadQuotes()
     _context.Entry(samurai).Collection(s => s.Quotes).Load();
     _context.Entry(samurai).Reference(s => s.Horse).Load();
 }
+
+void filteringWithRelatedData()
+{
+    var samurais = _context.Samurais
+                           .Where(s => s.Quotes.Any(q => q.Text.Contains("happy")))
+                           .ToList();
+}
+
+void modifyingRelatedDataWhenNotTracked()
+{
+    // Note, if tracking is continued, EF will manage toe changes required, but this is specifically for an untracked change
+
+    var samurai = _context.Samurais.Include(s => s.Quotes)
+                                   .FirstOrDefault(s => s.Id == 2);
+
+    var quote = samurai.Quotes[0];
+    quote.Text += "Did you hear that again?";
+
+    using var newContext = new SamuraiContext();
+    // newContext.Quotes.Update(quote); // This will update ALL quotes for the samurai, even though only one was modified as there was no tracking in this context
+
+    // Flag the specific instance as modified, not including any linked objects
+    newContext.Entry(quote).State = EntityState.Modified;
+
+    newContext.SaveChanges();
+}
+
+void removingSamuraiFromABattleWithInferredJoinTableRatherThanPayloadTable()
+{
+    var battleWithSamurai = _context.Battles
+        .Include(b => b.Samurais.Where(s => s.Id == 12))
+        .Single(s => s.BattleId == 1);
+    var samurai = battleWithSamurai.Samurais[0];
+    battleWithSamurai.Samurais.Remove(samurai);
+    _context.SaveChanges();
+
+    // // This WILL NOT WORK as the relationship is not tracked, so EF doesn't know to remove the link table entry
+    // var notLinkedBattle = _context.Battles.Find(1);
+    // var notLinkedSamurai = _context.Samurais.Find(12);
+    // notLinkedBattle.Samurais.Remove(notLinkedSamurai);
+    // _context.SaveChanges();
+}
+
+void removeSamuraiFromBattleWithPayloadTable()
+{
+    // Note: Using Set as there isn't an explicit DbSet, only an inferred one for this entity
+    var b_s = _context.Set<BattleSamurai>()
+                      .SingleOrDefault(bs => bs.BattleId == 1 && bs.SamuraiId == 10);
+
+    if (b_s is not null)
+    {
+        _context.Remove(b_s);
+        _context.SaveChanges();
+    }
+}
+
+void getHorsesWithSamuraiWithoutNavigationPropertyFromHorse()
+{
+    var horseonly = _context.Set<Horse>().Find(3);
+
+    var horseWithSamurai = _context.Samurais.Include(s => s.Horse)
+                                            .FirstOrDefault(s => s.Horse.Id == 3);
+
+    var horseSamuraiPairs = _context.Samurais
+        .Where(s => s.Horse != null)
+        .Select(s => new { s.Horse, Samurai = s })
+        .ToList();
+}
