@@ -11,23 +11,29 @@ public class SamuraiContext : DbContext
     public DbSet<Battle> Battles { get; set; }
     // public DbSet<SamuraiBattleStat> SamuraiBattleStats { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public SamuraiContext(DbContextOptions<SamuraiContext> options)
+        : base(options)
     {
-        // optionsBuilder.UseSqlServer(
-        //     // @"Data Source=localhost,9001;Initial Catalog=SamuraiAppDb;Persist Security Info=True;User ID=sa;Password=Password01!;TrustServerCertificate=True",
-        //     @"Server=localhost;Port=9002;Database=postgres;User Id=postgres;Password=Password01!;",
-        //     opt => opt.MaxBatchSize(100)
-        // )
-        //     .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
-        //     .EnableSensitiveDataLogging();
 
-        optionsBuilder.UseNpgsql(
-            @"Server=localhost;Port=9002;Database=postgres;User Id=postgres;Password=Password01!;",
-            opt => opt.MaxBatchSize(100)
-        )
-            .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
-            .EnableSensitiveDataLogging();
     }
+
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //{
+    //    // optionsBuilder.UseSqlServer(
+    //    //     // @"Data Source=localhost,9001;Initial Catalog=SamuraiAppDb;Persist Security Info=True;User ID=sa;Password=Password01!;TrustServerCertificate=True",
+    //    //     @"Server=localhost;Port=9002;Database=postgres;User Id=postgres;Password=Password01!;",
+    //    //     opt => opt.MaxBatchSize(100)
+    //    // )
+    //    //     .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
+    //    //     .EnableSensitiveDataLogging();
+
+    //    optionsBuilder.UseNpgsql(
+    //        @"Server=localhost;Port=9002;Database=postgres;User Id=postgres;Password=Password01!;",
+    //        opt => opt.MaxBatchSize(100)
+    //    )
+    //        .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
+    //        .EnableSensitiveDataLogging();
+    //}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
