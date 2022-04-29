@@ -18,6 +18,7 @@ queryAndUpdateBattles_Disconnected();
 insertNewSamuraiWithAQuote();
 addQuoteToExistingSamuraiWhileTracked();
 explicitLoadQuotes();
+projectSomeProperties();
 
 // Run a single query without tracking on the entities returned
 var untrackedSamurai = _context.Samurais.AsNoTracking().FirstOrDefault();
@@ -320,3 +321,34 @@ void getHorsesWithSamuraiWithoutNavigationPropertyFromHorse()
         .Select(s => new { s.Horse, Samurai = s })
         .ToList();
 }
+
+// void queryUsingRawSql()
+// {
+//     // NOTE: This SQL needs to return EXACTLY the same properties as the entity is expecting, it cannot be partial, and cannot supply more data than the type allows (e.g. extra columns)
+//     var samurais = _context.Samurais.FromSqlRaw("SELECT * FROM Samurais").ToList();
+    
+//     // You can still use things like Include as EF knows there is an Id property it can do the linking through
+//     var samuraisWithQuotes = _context.Samurais.FromSqlRaw("SELECT * FROM Samurais").Include(s => s.Quotes).ToList();
+
+//     // To use parameters, use interpolated strings with the FromSqlInterpolated method, and this will parameterise the query for you
+//     // NOTE: If you use FromSQLRaw, it will use standard interpolation, which can risk SQL injection attacks
+//     string name = "Kikuchyo";
+//     var samurai = _context.Samurais
+//         .FromSqlInterpolated($"SELECT * FROM Samurais WHERE Name = { name }")
+//         .ToList();
+// }
+
+// void queryUsingFromSqlRawStoredProc()
+// {
+//     var text = "Happy";
+//     // Note: Using the string formatting parameterisation, EF parameterises FromSqlRaw for us, the FromSqlInterpolated version could also be used here
+//     var samurais = _context.Samurais.FromSqlRaw("EXEC dbo.SamuraisWhoSaidAWord {0}", text).ToList();
+// }
+
+// void executeSomeRawSql()
+// {
+//     // This is only used for non-queries! These methods only ever return the number of rows affected.
+//     var samuraiId = 2;
+//     var affected = _context.Database.ExecuteSqlRaw("EXEC DeleteQuotesForSamurai {0}", samuraiId);
+//     var affected2 = _context.Database.ExecuteSqlInterpolated($"EXEC DeleteQuotesForSamurai {samuraiId}");
+// }

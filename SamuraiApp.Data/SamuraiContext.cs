@@ -9,6 +9,7 @@ public class SamuraiContext : DbContext
     public DbSet<Samurai> Samurais { get; set; }
     public DbSet<Quote> Quotes { get; set; }
     public DbSet<Battle> Battles { get; set; }
+    // public DbSet<SamuraiBattleStat> SamuraiBattleStats { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -46,5 +47,11 @@ public class SamuraiContext : DbContext
         // Specify the table name for an entity if required
         // This will trigger a migration to change the table name and the names of any related indexes/constraints
         // modelBuilder.Entity<Horse>().ToTable("Horses");
+
+        // Flag this entity as having no key, so no tracking is supplied for this entity type at all, as it relates to a view
+        // Note: No migration will be added for this, as EF doesn't handle the creation of views itself, these need to be done by writing a migration script manually
+        // modelBuilder.Entity<SamuraiBattleStat>()
+        //     .HasNoKey()
+        //     .ToView("SamuraiBattleStats");
     }
 }
