@@ -1,0 +1,24 @@
+http://localhost:5155/api/samurais
+
+###
+
+POST http://localhost:5155/api/samurais HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Huachao Mao"
+}
+
+###
+
+PUT http://localhost:5155/api/samurais/1 HTTP/1.1
+content-type: application/json
+
+{
+    "id": 1,
+    "name": "Julie"
+}
+
+###
+
+DELETE http://localhost:5155/api/Samurais/3
